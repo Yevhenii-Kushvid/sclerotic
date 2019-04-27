@@ -1,10 +1,10 @@
 # frozen_string_literal: true
-require "forgetsy/set"
-require "forgetsy/delta"
+require "sclerotic/set"
+require "sclerotic/delta"
 require "logger"
 require "redis"
 
-module Forgetsy
+module Sclerotic
   # Accepts:
   #   1. An instance of `Redis`, `Redis::Client`, `Redis::DistRedis`,
   #      `Redis::Namespace`, etc. (i.e. an existing Redis client instance)

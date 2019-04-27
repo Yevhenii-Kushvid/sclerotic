@@ -1,8 +1,8 @@
 require_relative './set'
 
-module Forgetsy
+module Sclerotic
   # An abstraction used to extract trending scores
-  # from two Forgetsy::Set instances decaying at
+  # from two Sclerotic::Set instances decaying at
   # differing rates.
   class Delta
     attr_accessor :name
@@ -16,21 +16,21 @@ module Forgetsy
       if opts.key?(:t)
         # we set the last decayed date of the secondary set to older than
         # the primary, in order to support retrospective observations.
-        secondary_date = Time.now - ((Time.now - opts[:date]) * Forgetsy::Delta::NORM_T_MULT)
+        secondary_date = Time.now - ((Time.now - opts[:date]) * Sclerotic::Delta::NORM_T_MULT)
 
-        Forgetsy::Set.create(primary_set_key,
+        Sclerotic::Set.create(primary_set_key,
                              t: opts[:t],
                              date: opts[:date])
 
-        Forgetsy::Set.create(secondary_set_key,
-                             t: opts[:t] * Forgetsy::Delta::NORM_T_MULT,
+        Sclerotic::Set.create(secondary_set_key,
+                             t: opts[:t] * Sclerotic::Delta::NORM_T_MULT,
                              date: secondary_date)
       end
 
       if opts.key?(:cache)
-        Forgetsy.redis.set(cache_lifetime_key, opts[:cache])
+        Sclerotic.redis.set(cache_lifetime_key, opts[:cache])
       end
-      @cache_lifetime = Forgetsy.redis.get(cache_lifetime_key)
+      @cache_lifetime = Sclerotic.redis.get(cache_lifetime_key)
     end
 
     # Factory method. Use this instead of direct
@@ -54,12 +54,12 @@ module Forgetsy
         opts[:date] ||= Time.now
       end
 
-      Forgetsy::Delta.new(name, opts)
+      Sclerotic::Delta.new(name, opts)
     end
 
     # Fetch an existing delta instance.
     def self.fetch(name)
-      delta = Forgetsy::Delta.new(name)
+      delta = Sclerotic::Delta.new(name)
       unless delta.exists?
         raise NameError,
              "No delta with that name exists".freeze
@@ -76,12 +76,12 @@ module Forgetsy
     #
     # @return Hash
     def fetch(opts = {})
-      if @cache_lifetime && Forgetsy.redis.get(cache_flag_key)
+      if @cache_lifetime && Sclerotic.redis.get(cache_flag_key)
         opts[:decay] = false
         opts[:scrub] = false
       else
-        Forgetsy.redis.set(cache_flag_key, true)
-        Forgetsy.redis.expire(cache_flag_key, @cache_lifetime.to_i)
+        Sclerotic.redis.set(cache_flag_key, true)
+        Sclerotic.redis.expire(cache_flag_key, @cache_lifetime.to_i)
       end
 
       # do not delegate the limit to sets
@@ -125,11 +125,11 @@ module Forgetsy
     end
 
     def primary_set
-      Forgetsy::Set.fetch(primary_set_key)
+      Sclerotic::Set.fetch(primary_set_key)
     end
 
     def secondary_set
-      Forgetsy::Set.fetch(secondary_set_key)
+      Sclerotic::Set.fetch(secondary_set_key)
     end
 
     def sets
@@ -137,9 +137,9 @@ module Forgetsy
     end
 
     def exists?
-      Forgetsy.redis.hexists(
-        Forgetsy::Set::METADATA_KEY,
-        "#{primary_set_key}:#{Forgetsy::Set::LIFETIME_KEY}"
+      Sclerotic.redis.hexists(
+        Sclerotic::Set::METADATA_KEY,
+        "#{primary_set_key}:#{Sclerotic::Set::LIFETIME_KEY}"
       )
     end
 
@@ -154,22 +154,22 @@ module Forgetsy
       #   return false
 
 
-      if Forgetsy.redis.get(cache_flag_key)
+      if Sclerotic.redis.get(cache_flag_key)
         return true
       else
-        Forgetsy.redis.set(cache_flag_key, true)
-        Forgetsy.redis.expire(cache_flag_key, opts[:cache])
+        Sclerotic.redis.set(cache_flag_key, true)
+        Sclerotic.redis.expire(cache_flag_key, opts[:cache])
 
         return false
       end
     end
 
     def cache_flag_key
-      "#{Forgetsy::Set::METADATA_KEY}:#{primary_set_key}:#{Forgetsy::Set::CACHE_KEY}"
+      "#{Sclerotic::Set::METADATA_KEY}:#{primary_set_key}:#{Sclerotic::Set::CACHE_KEY}"
     end
 
     def cache_lifetime_key
-      "#{Forgetsy::Set::METADATA_KEY}:#{primary_set_key}:#{Forgetsy::Set::CACHE_LIFETIME_KEY}"
+      "#{Sclerotic::Set::METADATA_KEY}:#{primary_set_key}:#{Sclerotic::Set::CACHE_LIFETIME_KEY}"
     end
 
     def primary_set_key

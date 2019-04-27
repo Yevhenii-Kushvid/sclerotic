@@ -1,12 +1,12 @@
 $:.unshift File.expand_path("../lib", __FILE__)
-require 'forgetsy/version'
+require 'sclerotic/version'
 
 Gem::Specification.new do |gem|
-  gem.name = "forgetsy"
-  gem.homepage = "http://github.com/cavvia/forgetsy"
+  gem.name = "sclerotic"
+  gem.homepage = "http://github.com/cavvia/sclerotic"
   gem.license = "MIT"
   gem.summary = %Q{A trending library built on redis.}
-  gem.version = Forgetsy::VERSION
+  gem.version = Sclerotic::VERSION
 
   gem.description = <<-EOS
     A scalable trending library that tracks temporal trends

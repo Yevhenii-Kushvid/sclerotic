@@ -1,4 +1,4 @@
-require File.expand_path("../../lib/forgetsy.rb", __FILE__)
+require File.expand_path("../../lib/sclerotic.rb", __FILE__)
 require "fakeredis/rspec"
 require "timecop"
 
@@ -9,7 +9,7 @@ MONTH = 30 * DAY
 
 RSpec.configure do |c|
   c.before(:all) do
-    Forgetsy.redis = Redis.new
+    Sclerotic.redis = Redis.new
   end
 
   c.after(:each) do

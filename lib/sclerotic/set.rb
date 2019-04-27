@@ -1,4 +1,4 @@
-module Forgetsy
+module Sclerotic
   # A data structure that decays counts exponentially
   # over time. Decay is applied at read time.
   class Set
@@ -6,7 +6,7 @@ module Forgetsy
 
     LAST_DECAYED_KEY = "_last_decay".freeze
     LIFETIME_KEY = "_t".freeze
-    METADATA_KEY = "_forgetsy".freeze
+    METADATA_KEY = "_sclerotic".freeze
     
     CACHE_KEY = "_cache".freeze
     CACHE_LIFETIME_KEY = "#{CACHE_KEY}#{LIFETIME_KEY}".freeze
@@ -34,7 +34,7 @@ module Forgetsy
 
       date = opts[:date] || Time.now
 
-      set = Forgetsy::Set.new(name)
+      set = Sclerotic::Set.new(name)
       set.update_decay_date(date)
       set.create_lifetime_key(opts[:t])
       set
@@ -42,7 +42,7 @@ module Forgetsy
 
     # Fetch an existing set instance.
     def self.fetch(name)
-      Forgetsy::Set.new(name)
+      Sclerotic::Set.new(name)
     end
 
     # Fetch the entire set, or optionally ask for
@@ -131,7 +131,7 @@ module Forgetsy
     private
 
     def redis(*args, &blk)
-      Forgetsy.redis(*args, &blk)
+      Sclerotic.redis(*args, &blk)
     end
 
     # Fetch the set without decay applied.
